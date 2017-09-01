@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+   integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <title>Bookmarker</title>
+</head>
+<body onload="fetchBookmarks()">
+<div class="container">
+  <h1>Bookmarker</h1>
+  <hr>
+      <div class="jumbotron">
+
+          <h1>Bookmark Your Favorite Site</h1>
+          <form id="myForm">
+            <div class="form-group">
+              <label>Site Name</label><br>
+              <input type="text" id="siteName" class="form-control" placeholder="Website Name">
+            </div>
+            <div class="form-group">
+              <label>Site Url</label><br>
+              <input type="text" class="form-group" id="siteUrl" placeholder="Site URL"><br><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+         </form>
+      </div>
+      <div class="row marketing">
+        <div class="col-lg-12">
+          <div id="resault">
+
+          </div>
+        </div>
+
+      </div>
+
+</div>
+
+<script type="text/javascript">
+  document.getElementById('myForm').addEventListener('submit', function(e){
+    //console.log("Clicked!");
+
+    //prevent form from submitting
+    e.preventDefault();
+
+    var name = document.getElementById('siteName').value;
+
+
+    //console.log(name);
+    var url = document.getElementById('siteUrl').value;
+
+  if(!validateForm(name, url)){
+    return false;
+  }
+
+    var bookmark = {
+      name: name,
+      url: url
+    }
+
+    if(localStorage.getItem('bookmarks') === null){
+      // Init array
+
+      var bookmarks = [];
+
+      //add to array
+      bookmarks.push(bookmark);
+
+      //set to localstorage
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    }else{
+      // get bookmarks from localStorage
+
+      var bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+
+      //add bookmarks to array
+
+      bookmarks.push(bookmark);
+
+      // Re - set back to local storage
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    }
+
+  // cleare the fomr
+
+  document.getElementById('myForm').reset();
+
+  fetchBookmarks();
+ //console.log(bookmark);
+     //document.getElementById('resault').innerHTML = name;
+
+  });
+
+  // Delete bookmarks
+  function deleteBookmark(url){
+  //Get bookmarks from localStorage
+    var bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+    //console.log(url);
+    // loop throught bookmarks
+
+    for(var i = 0; i < bookmarks.length; i++){
+      if(bookmarks[i].url == url){
+        // Remove from array
+
+        bookmarks.splice(i, 1);
+      }
+    }
+    // Re - set back to local storage
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+      //Re fetch bookmarks
+        fetchBookmarks();
+
+
+
+  }
+  // fetch thedat from localStorage
+
+  function fetchBookmarks(){
+
+
+    var bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+
+    //console.log(bookmarks);
+
+    // Get output id
+
+    var bookmarksResault = document.getElementById('resault');
+
+
+    //build output
+
+    bookmarksResault.innerHTML = '';
+   for( var i = 0; i < bookmarks.length; i ++){
+  var name = bookmarks[i].name;
+  var url = bookmarks[i].url;
+
+  bookmarksResault.innerHTML  += '<div class="well">'+
+                                  '<h3>'+name+
+                                  '<a class="btn btn-default" target="_blank" href="'+url+'">Visit</a> ' +
+                                  '<a onclick= "deleteBookmark(\''+url+'\')" class="btn btn-danger" href="#">Delete</a> '+
+                                  '</h3>' +
+                                  '</div>';
+ }
+
+  }
+
+  // validate form
+
+  function validateForm(name, url){
+    if(!name || !url){
+      alert('Please fill in the form!');
+      return false;
+    }
+   //check the url field via RegExp
+     var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                    
+     var regex = new RegExp(expression);
+     if(!url.match(regex)){
+       alert('Please use a valid url!');
+       return false;
+     }
+     return true;
+  }
+
+</script>
+</body>
+</html>
